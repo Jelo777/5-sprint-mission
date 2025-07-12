@@ -3,21 +3,36 @@ package com.sprint.mission.discodeit.entity;
 import java.time.Instant;
 import java.util.UUID;
 
-public class User {
+public class Channel {
     private UUID id;
     private long createdAt;
     private long updatedAt;
 
-    private String nickname;
+    private String chName;
+    private String chOwn;
 
-    public User(String nickname) {
-        this.id = UUID.randomUUID();
-        this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
-        this.nickname = nickname;
+    public Channel() {
     }
 
-    public User() {
+    public Channel(String chName, String chOwn){
+        this.id = UUID.randomUUID();
+        this.chName = chName;
+        this.chOwn = chOwn;
+        this.createdAt = Instant.now().getEpochSecond();
+        this.updatedAt = Instant.now().getEpochSecond();
+    }
+
+    public void setChOwn(String chOwn) {
+        this.chOwn = chOwn;
+    }
+
+    public void setChName(String chName){
+        this.chName = chName;
+    }
+
+    public void update(String chName){
+        this.chName = chName;
+        this.updatedAt = Instant.now().getEpochSecond();
     }
 
     public UUID getId() {
@@ -32,26 +47,22 @@ public class User {
         return updatedAt;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getChName() {
+        return chName;
     }
 
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
-    }
-
-    public void update(String nickname) {
-        this.nickname = nickname;
-        this.updatedAt = Instant.now().getEpochSecond();
+    public String getChOwn() {
+        return chOwn;
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("User{");
+        final StringBuilder sb = new StringBuilder("Channel{");
         sb.append("id=").append(id);
         sb.append(", createdAt=").append(createdAt);
         sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", nickname='").append(nickname).append('\'');
+        sb.append(", chName='").append(chName).append('\'');
+        sb.append(", chOwn='").append(chOwn).append('\'');
         sb.append('}');
         return sb.toString();
     }
