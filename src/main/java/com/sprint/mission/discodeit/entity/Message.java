@@ -18,7 +18,14 @@ public class Message {
     public Message(String content, String sender, String chName) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.content = content;
+        this.sender = sender;
+        this.chName = chName;
+    }
+
+    public Message(UUID id, String content, String sender, String chName) {
+        this.id = id;
+        this.createdAt = Instant.now().getEpochSecond();
         this.content = content;
         this.sender = sender;
         this.chName = chName;

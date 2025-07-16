@@ -19,15 +19,6 @@ public class Channel {
         this.chName = chName;
         this.chOwn = chOwn;
         this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
-    }
-
-    public void setChOwn(String chOwn) {
-        this.chOwn = chOwn;
-    }
-
-    public void setChName(String chName){
-        this.chName = chName;
     }
 
     public void update(String chName){

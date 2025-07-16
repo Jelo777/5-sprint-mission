@@ -8,7 +8,7 @@ import java.util.UUID;
 
 public interface ChannelService {
     boolean createChannel(String chName, String chOwn);
-    boolean updateChannel(String chName, String chOwn);
+    boolean updateChannel(String chName, String newChName);
     boolean deleteChannel(Channel channel);
     Map<UUID, Channel> getChannel();
     Map<UUID, Channel> getChannel(String chName);

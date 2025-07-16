@@ -10,6 +10,14 @@ import java.util.UUID;
 public class JCFChannelService implements ChannelService {
     private final Map<UUID, Channel> channels = new HashMap<>();
 
+    public JCFChannelService() {
+        channels.put(UUID.randomUUID(), new Channel("테스트채널1", "test1"));
+        channels.put(UUID.randomUUID(), new Channel("테스트채널2", "test2"));
+        channels.put(UUID.randomUUID(), new Channel("테스트채널3", "test3"));
+        channels.put(UUID.randomUUID(), new Channel("테스트채널4", "test4"));
+        channels.put(UUID.randomUUID(), new Channel("테스트채널5", "test5"));
+    }
+
     @Override
     public boolean createChannel(String chName, String chOwn) {
         for (Channel c : channels.values()) {
@@ -23,10 +31,10 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public boolean updateChannel(String chName, String chOwn) {
+    public boolean updateChannel(String chName, String newChName) {
         for (Channel c : channels.values()) {
-            if (c.getChName().equals(chName) && c.getChOwn().equals(chOwn)) {
-                c.update(chName);
+            if (c.getChName().equals(chName)) {
+                c.update(newChName);
                 return true;
             }
         }
@@ -50,10 +58,20 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
+//    public Map<UUID, Channel> getChannel(String chName) {
+//        Map<UUID, Channel> searchCh = new HashMap<>();
+//        for (Channel c : channels.values()) {
+//            if(c.getChOwn().contains(chName)){
+//                searchCh.put(c.getId(), c);
+//            }
+//        }
+//        return searchCh;
+//    }
+
     public Map<UUID, Channel> getChannel(String chName) {
         Map<UUID, Channel> searchCh = new HashMap<>();
         for (Channel c : channels.values()) {
-            if(c.getChOwn().contains(chName)){
+            if(c.getChName().equals(chName)){
                 searchCh.put(c.getId(), c);
             }
         }

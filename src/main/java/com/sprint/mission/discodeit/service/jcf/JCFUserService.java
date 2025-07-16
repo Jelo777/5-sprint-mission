@@ -10,6 +10,14 @@ import java.util.UUID;
 public class JCFUserService implements UserService {
     private final Map<UUID, User> users =  new HashMap<>();
 
+    public JCFUserService() {
+        users.put(UUID.randomUUID(), new User("test1"));
+        users.put(UUID.randomUUID(), new User("test2"));
+        users.put(UUID.randomUUID(), new User("test3"));
+        users.put(UUID.randomUUID(), new User("test4"));
+        users.put(UUID.randomUUID(), new User("test5"));
+    }
+
     @Override
     public boolean createUser(String nickName) {
         for(User existingUser : users.values()){
@@ -23,10 +31,10 @@ public class JCFUserService implements UserService {
     }
 
     @Override
-    public boolean updateUser(User user) {
+    public boolean updateUser(String currentNickname, String newNickname) {
         for(User existingUser : users.values()){
-            if(existingUser.getNickname().equals(user.getNickname())) {
-                existingUser.update(user.getNickname());
+            if(existingUser.getNickname().equals(currentNickname)) {
+                existingUser.update(newNickname);
                 return true;
             }
         }

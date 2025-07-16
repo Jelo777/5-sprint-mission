@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface UserService {
     boolean createUser(String nickname);
-    boolean updateUser(User user);
+    boolean updateUser(String currentNickname, String newNickname);
     boolean deleteUser(User user);
     User getUserByNickname(String nickname);
     Map<UUID, User> getUsers();

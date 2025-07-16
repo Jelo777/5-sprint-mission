@@ -11,9 +11,8 @@ public class User {
     private String nickname;
 
     public User(String nickname) {
-        this.id = UUID.randomUUID();
+        this.id = UUID.randomUUID();                 // id 초기화
         this.createdAt = Instant.now().getEpochSecond();
-        this.updatedAt = Instant.now().getEpochSecond();
         this.nickname = nickname;
     }
 
@@ -34,10 +33,6 @@ public class User {
 
     public String getNickname() {
         return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
     }
 
     public void update(String nickname) {
