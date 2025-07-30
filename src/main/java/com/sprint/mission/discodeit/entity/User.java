@@ -4,19 +4,21 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class User {
-    private UUID id;
-    private long createdAt;
+    private final UUID id;
+    private final long createdAt;
     private long updatedAt;
 
-    private String nickname;
+    private String username;
+    private String email;
+    private String password;
 
-    public User(String nickname) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();                 // id 초기화
         this.createdAt = Instant.now().getEpochSecond();
-        this.nickname = nickname;
-    }
 
-    public User() {
+        this.username = username;
+        this.email = email;
+        this.password = password;
     }
 
     public UUID getId() {
@@ -31,23 +33,46 @@ public class User {
         return updatedAt;
     }
 
-    public String getNickname() {
-        return nickname;
+    public String getUsername() {
+        return username;
     }
 
-    public void update(String nickname) {
-        this.nickname = nickname;
-        this.updatedAt = Instant.now().getEpochSecond();
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
+        boolean anyValueUpdated = false;
+        if (newUsername != null && !newUsername.equals(this.username)) {
+            this.username = newUsername;
+            anyValueUpdated = true;
+        }
+        if (newEmail != null && !newEmail.equals(this.email)) {
+            this.email = newEmail;
+            anyValueUpdated = true;
+        }
+        if (newPassword != null && !newPassword.equals(this.password)) {
+            this.password = newPassword;
+            anyValueUpdated = true;
+        }
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("User{");
-        sb.append("id=").append(id);
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", nickname='").append(nickname).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "User{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", username='" + username + '\'' +
+                ", email='" + email + '\'' +
+                ", password='" + password + '\'' +
+                '}';
     }
 }

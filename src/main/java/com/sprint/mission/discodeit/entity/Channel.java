@@ -5,56 +5,71 @@ import java.util.UUID;
 
 public class Channel {
     private UUID id;
-    private long createdAt;
-    private long updatedAt;
+    private Long createdAt;
+    private Long updatedAt;
 
-    private String chName;
-    private String chOwn;
+    private ChannelType type;
+    private String name;
+    private String description;
 
-    public Channel() {
-    }
-
-    public Channel(String chName, String chOwn){
+    public Channel(ChannelType type, String name, String description) {
         this.id = UUID.randomUUID();
-        this.chName = chName;
-        this.chOwn = chOwn;
         this.createdAt = Instant.now().getEpochSecond();
-    }
 
-    public void update(String chName){
-        this.chName = chName;
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.type = type;
+        this.name = name;
+        this.description = description;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
-    public String getChName() {
-        return chName;
+    public ChannelType getType() {
+        return type;
     }
 
-    public String getChOwn() {
-        return chOwn;
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void update(String newName, String newDescription) {
+        boolean anyValueUpdated = false;
+        if (newName != null && !newName.equals(this.name)) {
+            this.name = newName;
+            anyValueUpdated = true;
+        }
+        if (newDescription != null && !newDescription.equals(this.description)) {
+            this.description = newDescription;
+            anyValueUpdated = true;
+        }
+
+        if (anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Channel{");
-        sb.append("id=").append(id);
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", chName='").append(chName).append('\'');
-        sb.append(", chOwn='").append(chOwn).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "Channel{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", type=" + type +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
     }
 }

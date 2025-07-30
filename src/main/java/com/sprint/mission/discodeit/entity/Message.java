@@ -4,47 +4,33 @@ import java.time.Instant;
 import java.util.UUID;
 
 public class Message {
-    private UUID id;
-    private long createdAt;
-    private long updatedAt;
+    private final UUID id;
+    private final Long createdAt;
+    private Long updatedAt;
 
     private String content;
-    private String sender;
-    private String chName;
 
-    public Message() {
-    }
+    private UUID channelId;
+    private UUID authorId;
 
-    public Message(String content, String sender, String chName) {
+    public Message(String content, UUID channelId, UUID authorId) {
         this.id = UUID.randomUUID();
         this.createdAt = Instant.now().getEpochSecond();
-        this.content = content;
-        this.sender = sender;
-        this.chName = chName;
-    }
 
-    public Message(UUID id, String content, String sender, String chName) {
-        this.id = id;
-        this.createdAt = Instant.now().getEpochSecond();
         this.content = content;
-        this.sender = sender;
-        this.chName = chName;
-    }
-
-    public void update(String content, String sender, String chName) {
-        this.content = content;
-        this.updatedAt = Instant.now().getEpochSecond();
+        this.channelId = channelId;
+        this.authorId = authorId;
     }
 
     public UUID getId() {
         return id;
     }
 
-    public long getCreatedAt() {
+    public Long getCreatedAt() {
         return createdAt;
     }
 
-    public long getUpdatedAt() {
+    public Long getUpdatedAt() {
         return updatedAt;
     }
 
@@ -52,24 +38,34 @@ public class Message {
         return content;
     }
 
-    public String getSender() {
-        return sender;
+    public UUID getChannelId() {
+        return channelId;
     }
 
-    public String getChName() {
-        return chName;
+    public UUID getAuthorId() {
+        return authorId;
+    }
+
+    public void update(String newContent) {
+        boolean anyValueUpdated = false;
+        if(newContent != null && !newContent.equals(this.content)) {
+            this.content = newContent;
+            anyValueUpdated = true;
+        }
+        if(anyValueUpdated) {
+            this.updatedAt = Instant.now().getEpochSecond();
+        }
     }
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder("Message{");
-        sb.append("id=").append(id);
-        sb.append(", createdAt=").append(createdAt);
-        sb.append(", updatedAt=").append(updatedAt);
-        sb.append(", content='").append(content).append('\'');
-        sb.append(", sender='").append(sender).append('\'');
-        sb.append(", chName='").append(chName).append('\'');
-        sb.append('}');
-        return sb.toString();
+        return "Message{" +
+                "id=" + id +
+                ", createdAt=" + createdAt +
+                ", updatedAt=" + updatedAt +
+                ", content='" + content + '\'' +
+                ", channelId=" + channelId +
+                ", authorId=" + authorId +
+                '}';
     }
 }

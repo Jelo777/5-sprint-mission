@@ -1,58 +1,105 @@
 package com.sprint.mission.discodeit;
 
 import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.service.ChannelService;
+import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
-    static JCFUserService userService = new JCFUserService();
-    static JCFChannelService channelService = new JCFChannelService();
-    static JCFMessageService messageService = new JCFMessageService();
-
     public static void main(String[] args) {
-       userTest();
-       channelTest();
-       messageTest();
+        UserService userService = new JCFUserService();
+        ChannelService channelService = new JCFChannelService();
+        MessageService messageService = new JCFMessageService(channelService, userService);
+
+        // 테스트
+//        userCRUDTest(userService);
+//        channelCRUDTest(channelService);
+//        messageCRUDTest(messageService);
+
+        // 셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+        // 테스트
+        messageCreateTest(messageService, channel, user);
     }
 
-    public static void userTest() {
-        System.out.println("========== 유저 테스트 ==========");
-        userService.createUser("test0");
-        System.out.println("유저 전체 조회 : " + userService.getUsers().toString());
-        System.out.println("유저 단건 조회(test0) : " + userService.getUserByNickname("test0"));
-        boolean updateUser = userService.updateUser("test0", "testUpdate");
-        System.out.println(updateUser ? "업데이트 된 유저 : " + userService.getUserByNickname("testUpdate").toString() : "유저 업데이트 실패");
-        boolean deleteUser = userService.deleteUser(userService.getUserByNickname("testUpdate"));
-        System.out.println(deleteUser ? "유저 삭제 후 전체 조회 : " + userService.getUsers().toString() : "유저 삭제 실패");
+    static void userCRUDTest(UserService userService) {
+        // 생성
+        User user = userService.create("tester", "test1@test.com", "test1234");
+        System.out.println("유저 생성 : " + user.getId());
+        // 조회
+        User foundUser = userService.find(user.getId());
+        System.out.println("유저 조회(단건) : " + foundUser.getId());
+        List<User> foundUsers = userService.findAll();
+        System.out.println("유저 조회(다건) : " + foundUsers.size());
+        // 수정
+        User updatedUser = userService.update(user.getId(), null, null, "test4321");
+        System.out.println("유저 수정: " + updatedUser.toString());
+        // 삭제
+        userService.delete(user.getId());
+        List<User> foundUsersAfterDelete = userService.findAll();
+        System.out.println("유저 삭제: " + foundUsersAfterDelete.size());
     }
 
-    public static void channelTest() {
-        System.out.println("========== 채널 테스트 ==========");
-        channelService.createChannel("테스트채널0", "test0");
-        System.out.println("채널 전체 조회 : " + channelService.getChannel().toString());
-        System.out.println("채널 단건 조회(테스트채널0) : " + channelService.getChannel("테스트채널0"));
-        boolean updateCh = channelService.updateChannel("테스트채널0", "업데이트채널");
-        System.out.println(updateCh ? "업데이트 된 채널 : " + channelService.getChannel("업데이트채널").toString() : "채널 업데이트 실패");
-        boolean deleteCh = channelService.deleteChannel(channelService.getChannelByName("업데이트채널"));
-        System.out.println(deleteCh ? "채널 삭제 후 전체 조회 : " + channelService.getChannel() : "채널 삭제 실패");
+    static void channelCRUDTest(ChannelService channelService) {
+        // 생성
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
+        System.out.println("채널 생성 : " + channel.getId());
+        // 조회
+        Channel foundChannel = channelService.find(channel.getId());
+        System.out.println("채널 조회(단건) : " + foundChannel.getId());
+        List<Channel> foundChannels = channelService.findAll();
+        System.out.println("채널 조회(다건) : " + foundChannels.size());
+        // 수정
+        Channel updateChanel = channelService.update(channel.getId(), "공지사항", null);
+        System.out.println("채널 수정 : " + updateChanel.toString());
+        // 삭제
+        channelService.delete(channel.getId());
+        List<Channel> foundChannelsAfterDelete = channelService.findAll();
+        System.out.println("채널 삭제 : " + foundChannelsAfterDelete.size());
     }
 
-    public static void messageTest() {
-        System.out.println("========== 메세지 테스트 ==========");
-        Message sentMsg = messageService.sendMessage("테스트메세지0", "test0", "테스트채널0");
-        System.out.println("메세지 전체 조회 : " + messageService.getMessages().toString());
-        System.out.println("메세지 단건 조회(테스트메세지0) : " + messageService.getMessageById(sentMsg.getId()));
-        boolean updateMessage = messageService.updateMessage(sentMsg.getId(), "updateMessage");
-        System.out.println(updateMessage ? "업데이트된 메세지 : " + messageService.getMessageById(sentMsg.getId()) : "메시지 업데이트 실패");
-        boolean deleteMessage = messageService.deleteMessage(sentMsg.getId());
-        System.out.println(deleteMessage ? "메시지 삭제 후 전체 조회 : " + messageService.getMessages().toString() : "메시지 삭제 실패");
+    static void messageCRUDTest(MessageService messageService) {
+        // 생성
+        UUID channelId = UUID.randomUUID();
+        UUID authorId = UUID.randomUUID();
+        Message message = messageService.create("안녕하세요.", channelId, authorId);
+        System.out.println("메시지 생성: " + message.getId());
+        // 조회
+        Message foundMessage = messageService.find(message.getId());
+        System.out.println("메시지 조회(단건): " + foundMessage.getId());
+        List<Message> foundMessages = messageService.findAll();
+        System.out.println("메시지 조회(다건): " + foundMessages.size());
+        // 수정
+        Message updatedMessage = messageService.update(message.getId(), "반갑습니다.");
+        System.out.println("메시지 수정: " + updatedMessage.getContent());
+        // 삭재
+        messageService.delete(message.getId());
+        List<Message> foundMessagesAfterDelete = messageService.findAll();
+        System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
+    }
+
+    static User setupUser(UserService userService) {
+        User user = userService.create("tester", "test@test.com", "pw1234");
+        return user;
+    }
+
+    static Channel setupChannel(ChannelService channelService) {
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지입니다.");
+        return channel;
+    }
+
+    static void messageCreateTest(MessageService messageService, Channel channel, User author) {
+        Message message = messageService.create("안녕하세요", channel.getId(), author.getId());
+        System.out.println("메시지 생성: " + message.getId());
     }
 }
