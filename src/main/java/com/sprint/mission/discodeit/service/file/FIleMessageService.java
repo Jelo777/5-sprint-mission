@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -13,9 +15,14 @@ public class FIleMessageService implements MessageService {
     private final String DIRECTORY;
     private final String EXTENSION;
 
-    public FIleMessageService() {
+    private final UserService userService;
+    private final ChannelService channelService;
+
+    public FIleMessageService(UserService userService, ChannelService channelService) {
         this.DIRECTORY = "MESSAGE";
         this.EXTENSION = ".ser";
+        this.userService = userService;
+        this.channelService = channelService;
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
             try {
@@ -28,6 +35,12 @@ public class FIleMessageService implements MessageService {
 
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
         Message message = new Message(content, channelId, authorId);
         Path path = Paths.get(DIRECTORY, message.getId() + EXTENSION);
         try (FileOutputStream fos = new FileOutputStream(path.toFile());

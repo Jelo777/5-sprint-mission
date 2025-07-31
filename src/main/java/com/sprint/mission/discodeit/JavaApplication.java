@@ -24,21 +24,21 @@ public class JavaApplication {
     public static void main(String[] args) {
         UserService userService = new FileUserService();
         ChannelService channelService = new FileChannelService();
-        MessageService messageService = new FIleMessageService();
+        MessageService messageService = new FIleMessageService(userService, channelService);
 
         // 레포지토리
         // UserRepository userRepository = new FileUserRepository();
 
         // 테스트
-        userCRUDTest(userService);
-        channelCRUDTest(channelService);
-        messageCRUDTest(messageService);
+//        userCRUDTest(userService);
+//        channelCRUDTest(channelService);
+//        messageCRUDTest(messageService);
 
-        // 셋업
-//        User user = setupUser(userService);
-//        Channel channel = setupChannel(channelService);
-        // 테스트
-//        messageCreateTest(messageService, channel, user);
+//         셋업
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
+//         테스트
+        messageCreateTest(messageService, channel, user);
     }
 
     static void userCRUDTest(UserService userService) {
