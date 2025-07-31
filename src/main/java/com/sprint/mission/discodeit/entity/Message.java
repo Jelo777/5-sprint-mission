@@ -48,11 +48,11 @@ public class Message {
 
     public void update(String newContent) {
         boolean anyValueUpdated = false;
-        if(newContent != null && !newContent.equals(this.content)) {
+        if (newContent != null && !newContent.equals(this.content)) {
             this.content = newContent;
             anyValueUpdated = true;
         }
-        if(anyValueUpdated) {
+        if (anyValueUpdated) {
             this.updatedAt = Instant.now().getEpochSecond();
         }
     }

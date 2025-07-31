@@ -16,7 +16,7 @@ public interface UserRepository {
 
     long count();
 
-    User delete(UUID id);
+    void delete(UUID id);
 
     boolean existsById(UUID id);
 

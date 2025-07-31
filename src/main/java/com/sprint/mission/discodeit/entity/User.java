@@ -1,16 +1,17 @@
 package com.sprint.mission.discodeit.entity;
 
+import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-public class User {
+public class User implements Serializable {
     private final UUID id;
     private final long createdAt;
     private long updatedAt;
 
     private String username;
     private String email;
-    private String password;
+    private transient String password;
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();                 // id 초기화
