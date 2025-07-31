@@ -19,7 +19,7 @@ public class FileUserRepository implements UserRepository {
     private final String DIRECTORY;
     private final String EXTENSION;
 
-    public FileUserRepository(String directory, String extension) {
+    public FileUserRepository() {
         this.DIRECTORY = "USER";
         this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);

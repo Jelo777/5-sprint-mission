@@ -4,6 +4,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -19,6 +22,9 @@ public class JavaApplication {
         UserService userService = new JCFUserService();
         ChannelService channelService = new JCFChannelService();
         MessageService messageService = new JCFMessageService(channelService, userService);
+
+        // 레포지토리
+        UserRepository userRepository = new FileUserRepository();
 
         // 테스트
 //        userCRUDTest(userService);
@@ -89,17 +95,17 @@ public class JavaApplication {
     }
 
     static User setupUser(UserService userService) {
-        User user = userService.create("tester", "test@test.com", "pw1234");
+        User user = userService.create("woody", "woody@codeit.com", "woody1234");
         return user;
     }
 
     static Channel setupChannel(ChannelService channelService) {
-        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지입니다.");
+        Channel channel = channelService.create(ChannelType.PUBLIC, "공지", "공지 채널입니다.");
         return channel;
     }
 
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
-        Message message = messageService.create("안녕하세요", channel.getId(), author.getId());
+        Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
         System.out.println("메시지 생성: " + message.getId());
     }
 }
