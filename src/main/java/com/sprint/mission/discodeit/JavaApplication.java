@@ -10,6 +10,9 @@ import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.file.FIleMessageService;
+import com.sprint.mission.discodeit.service.file.FileChannelService;
+import com.sprint.mission.discodeit.service.file.FileUserService;
 import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
@@ -19,23 +22,23 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
-        UserService userService = new JCFUserService();
-        ChannelService channelService = new JCFChannelService();
-        MessageService messageService = new JCFMessageService(channelService, userService);
+        UserService userService = new FileUserService();
+        ChannelService channelService = new FileChannelService();
+        MessageService messageService = new FIleMessageService();
 
         // 레포지토리
-        UserRepository userRepository = new FileUserRepository();
+        // UserRepository userRepository = new FileUserRepository();
 
         // 테스트
-//        userCRUDTest(userService);
-//        channelCRUDTest(channelService);
-//        messageCRUDTest(messageService);
+        userCRUDTest(userService);
+        channelCRUDTest(channelService);
+        messageCRUDTest(messageService);
 
         // 셋업
-        User user = setupUser(userService);
-        Channel channel = setupChannel(channelService);
+//        User user = setupUser(userService);
+//        Channel channel = setupChannel(channelService);
         // 테스트
-        messageCreateTest(messageService, channel, user);
+//        messageCreateTest(messageService, channel, user);
     }
 
     static void userCRUDTest(UserService userService) {

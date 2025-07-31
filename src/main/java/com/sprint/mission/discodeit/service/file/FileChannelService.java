@@ -2,10 +2,8 @@ package com.sprint.mission.discodeit.service.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.ChannelService;
 
-import javax.imageio.IIOException;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -17,9 +15,9 @@ public class FileChannelService implements ChannelService {
     private final String EXTENSION;
 
     public FileChannelService() {
-        this.DIRECTORY = "USER";
+        this.DIRECTORY = "CHANNEL";
         this.EXTENSION = ".ser";
-        Path path = Paths.get(DIRECTORY, EXTENSION);
+        Path path = Paths.get(DIRECTORY);
         if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);

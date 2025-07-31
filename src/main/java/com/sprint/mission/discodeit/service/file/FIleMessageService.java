@@ -14,7 +14,7 @@ public class FIleMessageService implements MessageService {
     private final String EXTENSION;
 
     public FIleMessageService() {
-        this.DIRECTORY = "USER";
+        this.DIRECTORY = "MESSAGE";
         this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
