@@ -37,7 +37,7 @@ public class JCFUserRepository implements UserRepository {
 
     @Override
     public void delete(UUID id) {
-        data.remove(id);
+        this.data.remove(id);
     }
 
     @Override
