@@ -1,82 +1,65 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
-    private final Map<UUID, Message> messages = new HashMap<>();
+    private final Map<UUID, Message> data;
 
-    public JCFMessageService() {
-        messages.put(UUID.randomUUID(), new Message("테스트메시지1", "test1", "테스트채널1"));
-        messages.put(UUID.randomUUID(), new Message("테스트메시지2", "test2", "테스트채널2"));
-        messages.put(UUID.randomUUID(), new Message("테스트메시지3", "test3", "테스트채널3"));
-        messages.put(UUID.randomUUID(), new Message("테스트메시지4", "test4", "테스트채널4"));
-        messages.put(UUID.randomUUID(), new Message("테스트메시지5", "test5", "테스트채널5"));
+    private final UserService userService;
+    private final ChannelService channelService;
+
+    public JCFMessageService(ChannelService channelService, UserService userService) {
+        this.data = new HashMap<>();
+        this.channelService = channelService;
+        this.userService = userService;
     }
 
     @Override
-    public Message sendMessage(String content, String sender, String chName) {
-        UUID id = UUID.randomUUID();
-        Message message = new Message(id, content, sender, chName);
-        messages.put(message.getId(), message);
+    public Message create(String content, UUID channelId, UUID authorId) {
+        try {
+            channelService.find(channelId);
+            userService.find(authorId);
+        } catch (NoSuchElementException e) {
+            throw e;
+        }
+        Message message = new Message(content, channelId, authorId);
+        this.data.put(channelId, message);
         return message;
     }
 
     @Override
-    public Map<UUID, Message> getMessages() {
-        return messages;
+    public Message find(UUID messageId) {
+        Message message = this.data.get(messageId);
+        return Optional.ofNullable(message)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
     }
 
     @Override
-    public Map<UUID, Message> getMessages(String chName) {
-        Map<UUID, Message> chMessage = new HashMap<>();
-        for (Message message : messages.values()) {
-            if(message.getChName().equals(chName)){
-                chMessage.put(message.getId(), message);
-            }
+    public List<Message> findAll() {
+        return this.data.values().stream().toList();
+    }
+
+    @Override
+    public Message update(UUID messageId, String newContent) {
+        Message messageNullable = this.data.get(messageId);
+        Message message = Optional.ofNullable(messageNullable)
+                .orElseThrow(() -> new NoSuchElementException("Message with id " + messageId + " not found"));
+        message.update(newContent);
+
+        return message;
+    }
+
+    @Override
+    public void delete(UUID messageId) {
+        if(!this.data.containsKey(messageId)) {
+            throw new NoSuchElementException("Message with id " + messageId + " not found");
         }
-        return chMessage;
-    }
-
-    @Override
-    public Map<UUID, Message> getMessageByNickname(String nickname) {
-        Map<UUID, Message> nickMessage = new HashMap<>();
-        for (Message message : messages.values()) {
-            if(message.getChName().equals(nickname)){
-                nickMessage.put(message.getId(), message);
-            }
-        }
-        return nickMessage;
-    }
-
-    @Override
-    public Message getMessageById(UUID id) {
-        return messages.get(id);
-    }
-
-    @Override
-    public boolean deleteMessage(UUID id) {
-        for(Message message : messages.values()){
-            if(message.getId().equals(id)){
-                messages.remove(message.getId());
-                return true;
-            }
-        }
-        return false;
-    }
-
-    @Override
-    public boolean updateMessage(UUID id, String content) {
-        for (Message msg : messages.values()) {
-            if(msg.getId().equals(id)){
-                msg.update(content, msg.getSender(), msg.getChName());
-                return true;
-            }
-        }
-        return false;
+        this.data.remove(messageId);
     }
 }

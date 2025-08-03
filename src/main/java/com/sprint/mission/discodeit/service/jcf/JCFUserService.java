@@ -3,68 +3,54 @@ package com.sprint.mission.discodeit.service.jcf;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.UserService;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.function.Supplier;
 
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> users =  new HashMap<>();
+    private final Map<UUID, User> data;
 
     public JCFUserService() {
-        users.put(UUID.randomUUID(), new User("test1"));
-        users.put(UUID.randomUUID(), new User("test2"));
-        users.put(UUID.randomUUID(), new User("test3"));
-        users.put(UUID.randomUUID(), new User("test4"));
-        users.put(UUID.randomUUID(), new User("test5"));
+        this.data = new HashMap<>();
     }
 
     @Override
-    public boolean createUser(String nickName) {
-        for(User existingUser : users.values()){
-            if(existingUser.getNickname().equals(nickName)) {
-                return false;
+    public User create(String username, String email, String password) {
+        User user = new User(username, email, password);
+        this.data.put(user.getId(), user);
+        return user;
+    }
+
+    @Override
+    public User find(UUID userId) {
+        User user = this.data.get(userId);
+        //return Optional.ofNullable(user).orElseThrow(()->new NoSuchElementException("User with id " + user + " not found"));
+        return Optional.ofNullable(user).orElseThrow(new Supplier<NoSuchElementException>() {
+            @Override
+            public NoSuchElementException get() {
+                return new NoSuchElementException("User with id " + user + " not found");
             }
-        }
-        User newUser = new User(nickName);
-        users.put(newUser.getId(), newUser);
-        return true;
+        });
     }
 
     @Override
-    public boolean updateUser(String currentNickname, String newNickname) {
-        for(User existingUser : users.values()){
-            if(existingUser.getNickname().equals(currentNickname)) {
-                existingUser.update(newNickname);
-                return true;
-            }
-        }
-        return false;
+    public List<User> findAll() {
+        return this.data.values().stream().toList();
     }
 
     @Override
-    public boolean deleteUser(User user) {
-        for(User existingUser : users.values()){
-            if(existingUser.getNickname().equals(user.getNickname())) {
-                users.remove(existingUser.getId());
-                return true;
-            }
-        }
-        return false;
+    public User update(UUID userId, String newUsername, String newEmail, String newPassword) {
+        User userNullable = this.data.get(userId);
+        User user = Optional.ofNullable(userNullable)
+                .orElseThrow(()->new NoSuchElementException("User with id " + userId + " not found"));
+        user.update(newUsername, newEmail, newPassword);
+        return user;
     }
 
     @Override
-    public User getUserByNickname(String nickname) {
-        for(User existingUser : users.values()){
-            if(existingUser.getNickname().equals(nickname)) {
-                return existingUser;
-            }
+    public void delete(UUID userId) {
+        if(!this.data.containsKey(userId)) {
+            throw new NoSuchElementException("User with id " + userId + " not found");
         }
-        return null;
-    }
-
-
-    @Override
-    public Map<UUID, User> getUsers() {
-        return users;
+        this.data.remove(userId);
     }
 }
