@@ -30,7 +30,7 @@ public class JavaApplication {
         // 서비스 초기화
         UserService userService = new BasicUserService(userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository, channelService, userService);
+        MessageService messageService = new BasicMessageService(messageRepository, userService, channelService);
 
 //        // 셋업
         User user = setupUser(userService);
