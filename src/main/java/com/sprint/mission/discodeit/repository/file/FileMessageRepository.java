@@ -15,11 +15,10 @@ import java.util.stream.Stream;
 
 public class FileMessageRepository implements MessageRepository {
     private final String DIRECTORY;
-    private final String EXTENSION;
+    private final String EXTENSION = ".ser";
 
     public FileMessageRepository() {
         this.DIRECTORY = "MESSAGE";
-        this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
             try {
@@ -37,7 +36,7 @@ public class FileMessageRepository implements MessageRepository {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return message;
     }

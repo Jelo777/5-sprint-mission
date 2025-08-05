@@ -30,18 +30,18 @@ public class JavaApplication {
         // 서비스 초기화
         UserService userService = new BasicUserService(userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository);
-        MessageService messageService = new BasicMessageService(messageRepository);
+        MessageService messageService = new BasicMessageService(messageRepository, channelService, userService);
 
 //        // 셋업
-//        User user = setupUser(userService);
-//        Channel channel = setupChannel(channelService);
+        User user = setupUser(userService);
+        Channel channel = setupChannel(channelService);
 //        // 테스트
-//        messageCreateTest(messageService, channel, user);
+        messageCreateTest(messageService, channel, user);
 
         // 테스트
-        userCRUDTest(userService);
-        channelCRUDTest(channelService);
-        messageCRUDTest(messageService);
+//        userCRUDTest(userService);
+//        channelCRUDTest(channelService);
+//        messageCRUDTest(messageService);
 
     }
 
@@ -60,7 +60,7 @@ public class JavaApplication {
         // 삭제
         userService.delete(user.getId());
         List<User> foundUsersAfterDelete = userService.findAll();
-        System.out.println("유저 삭제: " + foundUsersAfterDelete.size());
+        System.out.println("유저 삭제 완료, 삭제 후 유저 개수 : " + foundUsersAfterDelete.size());
     }
 
     static void channelCRUDTest(ChannelService channelService) {
@@ -78,7 +78,7 @@ public class JavaApplication {
         // 삭제
         channelService.delete(channel.getId());
         List<Channel> foundChannelsAfterDelete = channelService.findAll();
-        System.out.println("채널 삭제 : " + foundChannelsAfterDelete.size());
+        System.out.println("채널 삭제 완료, 삭제 후 채널 개수 : " + foundChannelsAfterDelete.size());
     }
 
     static void messageCRUDTest(MessageService messageService) {
@@ -98,7 +98,7 @@ public class JavaApplication {
         // 삭재
         messageService.delete(message.getId());
         List<Message> foundMessagesAfterDelete = messageService.findAll();
-        System.out.println("메시지 삭제: " + foundMessagesAfterDelete.size());
+        System.out.println("메시지 삭제 완료, 삭제 후 메시지 개수 : " + foundMessagesAfterDelete.size());
     }
 
     static User setupUser(UserService userService) {

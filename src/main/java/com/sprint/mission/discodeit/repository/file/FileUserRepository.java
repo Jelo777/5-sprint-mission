@@ -15,11 +15,10 @@ import java.util.stream.Stream;
 
 public class FileUserRepository implements UserRepository {
     private final String DIRECTORY;
-    private final String EXTENSION;
+    private final String EXTENSION = ".ser";
 
     public FileUserRepository() {
         this.DIRECTORY = "USER";
-        this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
             try {
@@ -37,7 +36,7 @@ public class FileUserRepository implements UserRepository {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(user);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return user;
     }
