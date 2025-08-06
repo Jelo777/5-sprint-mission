@@ -9,8 +9,9 @@ import java.util.UUID;
 @Getter
 public class User implements Serializable {
     private final UUID id;
-    private final long createdAt;
-    private long updatedAt;
+    private UUID profileId;
+    private final Instant createdAt;
+    private Instant updatedAt;
 
     private String username;
     private String email;
@@ -18,15 +19,20 @@ public class User implements Serializable {
 
     public User(String username, String email, String password) {
         this.id = UUID.randomUUID();                 // id 초기화
-        this.createdAt = Instant.now().getEpochSecond();
+        this.createdAt = Instant.now();
 
         this.username = username;
         this.email = email;
         this.password = password;
     }
 
-    public void update(String newUsername, String newEmail, String newPassword) {
+    public void update(UUID profileId, String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
+        if(profileId != null || this.profileId == null){
+            this.profileId = profileId;
+            anyValueUpdated = true;
+        }
+
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
             anyValueUpdated = true;
@@ -40,7 +46,7 @@ public class User implements Serializable {
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now().getEpochSecond();
+            this.updatedAt = Instant.now();
         }
     }
 
@@ -48,6 +54,7 @@ public class User implements Serializable {
     public String toString() {
         return "User{" +
                 "id=" + id +
+                ", profileId=" + profileId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", username='" + username + '\'' +
