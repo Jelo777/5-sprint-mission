@@ -17,22 +17,23 @@ public class User implements Serializable {
     private String email;
     private String password;
 
-    public User(String username, String email, String password) {
+    public User(String username, String email, String password, UUID profileId) {
         this.id = UUID.randomUUID();                 // id 초기화
         this.createdAt = Instant.now();
 
         this.username = username;
         this.email = email;
         this.password = password;
+
+        this.profileId = profileId;
     }
 
     public void update(UUID profileId, String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
-        if(profileId != null || this.profileId == null){
+        if (profileId != null || this.profileId == null) {
             this.profileId = profileId;
             anyValueUpdated = true;
         }
-
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
             anyValueUpdated = true;

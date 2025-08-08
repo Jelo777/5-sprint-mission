@@ -1,28 +1,27 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
 @Repository
-public class FileUserRepository implements UserRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final String DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileUserRepository() {
-        this.DIRECTORY = "USER";
+    public FileBinaryContentRepository() {
+        this.DIRECTORY = "BINARY_CONTENT";
         Path path = Paths.get(DIRECTORY);
-        if (!path.toFile().exists()) {
+        if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
@@ -32,27 +31,27 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public User save(User user) {
-        Path path = Paths.get(DIRECTORY, user.getId() + EXTENSION);
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = Paths.get(DIRECTORY, binaryContent.getId() + EXTENSION);
         try (FileOutputStream fos = new FileOutputStream(path.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(user);
+             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+            oos.writeObject(binaryContent);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return user;
+        return binaryContent;
     }
 
     @Override
-    public Optional<User> findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path path = Paths.get(DIRECTORY, id + EXTENSION);
         if (!path.toFile().exists()) {
             return Optional.empty();
         }
         try (FileInputStream fis = new FileInputStream(path.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis);) {
-            User user = (User) ois.readObject();
-            return Optional.of(user);
+            BinaryContent binaryContent = (BinaryContent) ois.readObject();
+            return Optional.of(binaryContent);
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
             return Optional.empty();
@@ -60,23 +59,23 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<BinaryContent> findAll() {
         Path directory = Paths.get(DIRECTORY);
         try {
-            List<User> users = Files.list(directory)
+            List<BinaryContent> binaryContents = Files.list(directory)
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
                             Object data = ois.readObject();
-                            return (User) data;
+                            return (BinaryContent) data;
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
                     })
                     .toList();
-            return users;
+            return binaryContents;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
@@ -107,43 +106,4 @@ public class FileUserRepository implements UserRepository {
         Path path = Paths.get(DIRECTORY, id + EXTENSION);
         return Files.exists(path);
     }
-
-    @Override
-    public boolean existsByUsername(String username) {
-        try (Stream<Path> files = Files.list(Paths.get(DIRECTORY))) {
-            return files.anyMatch(path -> {
-                try (
-                        FileInputStream fis = new FileInputStream(path.toFile());
-                        ObjectInputStream ois = new ObjectInputStream(fis)
-                ) {
-                    User user = (User) ois.readObject();
-                    return user.getUsername().equals(username);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public boolean existsByEmail(String email) {
-        try (Stream<Path> files = Files.list(Paths.get(DIRECTORY))) {
-            return files.anyMatch(path -> {
-                try (
-                        FileInputStream fis = new FileInputStream(path.toFile());
-                        ObjectInputStream ois = new ObjectInputStream(fis)
-                ) {
-                    User user = (User) ois.readObject();
-                    return user.getEmail().equals(email);
-                } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException(e);
-                }
-            });
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
 }

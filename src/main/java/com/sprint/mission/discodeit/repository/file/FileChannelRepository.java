@@ -84,9 +84,6 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public long count() {
         Path directory = Paths.get(DIRECTORY);
-        if (!Files.exists(directory)) {
-            return 0;
-        }
         try (Stream<Path> stream = Files.list(directory)) {
             return stream.filter(path -> path.toString().endsWith(EXTENSION)).count();
         } catch (IOException e) {
