@@ -8,10 +8,7 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Stream;
 
 @Repository
@@ -141,6 +138,30 @@ public class FileUserRepository implements UserRepository {
                     throw new RuntimeException(e);
                 }
             });
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        Path directory = Paths.get(DIRECTORY);
+        try (Stream<Path> stream = Files.list(directory)) {
+            return stream
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                                ) {
+                            return (User) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(user -> user.getUsername().equals(username))
+                    .findFirst();
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
