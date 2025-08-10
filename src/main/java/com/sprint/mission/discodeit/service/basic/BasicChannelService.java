@@ -62,7 +62,7 @@ public class BasicChannelService implements ChannelService {
         Instant lastestMessage = messageRepository.findLatestCreatedAtByChannelId(channelId).orElse(null);
         List<UUID> memberIds = null;
         if (channel.getType() == ChannelType.PRIVATE) {
-            memberIds = readStatusRepository.findAllByChannelId(channelId);
+            memberIds = readStatusRepository.findAllUserIdsByChannelId(channelId);
         }
         return new ChannelDto.ChannelResponse(
                 channel.getId(),
@@ -91,7 +91,7 @@ public class BasicChannelService implements ChannelService {
                         List.of()
                 )).toList();
 
-        List<UUID> privateChannelIds = readStatusRepository.findAllByUserId(userId);
+        List<UUID> privateChannelIds = readStatusRepository.findAllChannelIdsByUserId(userId);
 
         List<ChannelDto.ChannelResponse> privateChannels = privateChannelIds.stream()
                 .map(channelRepository::findById)
@@ -99,7 +99,7 @@ public class BasicChannelService implements ChannelService {
                 .map(Optional::get)
                 .filter(channel -> channel.getType() == ChannelType.PRIVATE)
                 .map(channel -> {
-                    List<UUID> memberIds = readStatusRepository.findAllByChannelId(channel.getId());
+                    List<UUID> memberIds = readStatusRepository.findAllUserIdsByChannelId(channel.getId());
                     return new ChannelDto.ChannelResponse(
                             channel.getId(),
                             channel.getType(),
@@ -147,7 +147,7 @@ public class BasicChannelService implements ChannelService {
             }
             messageRepository.delete(message.getId());
         });
-        readStatusRepository.findAllByChannelId(channel.getId()).forEach(userRepository::delete);
+        readStatusRepository.findAllUserIdsByChannelId(channel.getId()).forEach(userRepository::delete);
         channelRepository.delete(channelId);
     }
 }

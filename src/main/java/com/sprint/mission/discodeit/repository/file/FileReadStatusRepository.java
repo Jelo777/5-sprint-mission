@@ -109,7 +109,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<UUID> findAllByChannelId(UUID channelId) {
+    public List<UUID> findAllUserIdsByChannelId(UUID channelId) {
         Path directory = Paths.get(DIRECTORY);
         try (Stream<Path> stream = Files.list(directory)) {
             return stream.filter(path -> path.toString().endsWith(EXTENSION))
@@ -130,7 +130,7 @@ public class FileReadStatusRepository implements ReadStatusRepository {
     }
 
     @Override
-    public List<UUID> findAllByUserId(UUID userId) {
+    public List<UUID> findAllChannelIdsByUserId(UUID userId) {
         Path directory = Paths.get(DIRECTORY);
         try (Stream<Path> stream = Files.list(directory)) {
             return stream.filter(path -> path.toString().endsWith(EXTENSION))
@@ -146,6 +146,30 @@ public class FileReadStatusRepository implements ReadStatusRepository {
                     }).filter(Objects::nonNull)
                     .filter(readStatus -> readStatus.getUserId().equals(userId))
                     .map(ReadStatus::getChannelId)
+                    .toList();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    @Override
+    public List<ReadStatus> findAllByUserId(UUID userId) {
+        Path directory = Paths.get(DIRECTORY);
+        try (Stream<Path> stream = Files.list(directory)) {
+            return stream
+                    .filter(path -> path.toString().endsWith(EXTENSION))
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis)
+                        ) {
+                            return (ReadStatus) ois.readObject();
+                        } catch (IOException | ClassNotFoundException e) {
+                            return null;
+                        }
+                    })
+                    .filter(Objects::nonNull)
+                    .filter(readStatus -> readStatus.getUserId().equals(userId))
                     .toList();
         } catch (IOException e) {
             throw new RuntimeException(e);
