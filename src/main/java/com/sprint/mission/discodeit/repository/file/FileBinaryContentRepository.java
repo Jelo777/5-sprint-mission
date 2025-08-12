@@ -1,30 +1,27 @@
 package com.sprint.mission.discodeit.repository.file;
 
-import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Repository
-public class FileChannelRepository implements ChannelRepository {
+public class FileBinaryContentRepository implements BinaryContentRepository {
     private final String DIRECTORY;
     private final String EXTENSION = ".ser";
 
-    public FileChannelRepository() {
-        this.DIRECTORY = "CHANNEL";
+    public FileBinaryContentRepository() {
+        this.DIRECTORY = "BINARY_CONTENT";
         Path path = Paths.get(DIRECTORY);
-        if (!path.toFile().exists()) {
+        if (!Files.exists(path)) {
             try {
                 Files.createDirectories(path);
             } catch (IOException e) {
@@ -34,73 +31,51 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public Channel save(Channel channel) {
-        Path path = Paths.get(DIRECTORY, channel.getId() + EXTENSION);
+    public BinaryContent save(BinaryContent binaryContent) {
+        Path path = Paths.get(DIRECTORY, binaryContent.getId() + EXTENSION);
         try (FileOutputStream fos = new FileOutputStream(path.toFile());
-             ObjectOutputStream oos = new ObjectOutputStream(fos)) {
-            oos.writeObject(channel);
+             ObjectOutputStream oos = new ObjectOutputStream(fos);) {
+            oos.writeObject(binaryContent);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
-        return channel;
+        return binaryContent;
     }
 
     @Override
-    public Optional<Channel> findById(UUID id) {
+    public Optional<BinaryContent> findById(UUID id) {
         Path path = Paths.get(DIRECTORY, id + EXTENSION);
         if (!path.toFile().exists()) {
             return Optional.empty();
         }
         try (FileInputStream fis = new FileInputStream(path.toFile());
              ObjectInputStream ois = new ObjectInputStream(fis);) {
-            Channel channel = (Channel) ois.readObject();
-            return Optional.of(channel);
+            BinaryContent binaryContent = (BinaryContent) ois.readObject();
+            return Optional.of(binaryContent);
         } catch (IOException | ClassNotFoundException e) {
+            e.printStackTrace();
             return Optional.empty();
         }
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<BinaryContent> findAll() {
         Path directory = Paths.get(DIRECTORY);
         try {
-            List<Channel> channels = Files.list(directory)
+            List<BinaryContent> binaryContents = Files.list(directory)
                     .map(path -> {
                         try (
                                 FileInputStream fis = new FileInputStream(path.toFile());
                                 ObjectInputStream ois = new ObjectInputStream(fis)
                         ) {
                             Object data = ois.readObject();
-                            return (Channel) data;
+                            return (BinaryContent) data;
                         } catch (IOException | ClassNotFoundException e) {
                             throw new RuntimeException(e);
                         }
-                    }).toList();
-            return channels;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-
-        }
-    }
-
-    @Override
-    public List<Channel> findAllByType(ChannelType type) {
-        Path directory = Paths.get(DIRECTORY);
-        try {
-            List<Channel> channels = Files.list(directory)
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            Object data = ois.readObject();
-                            return (Channel) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).filter(channel -> channel.getType() == type)
+                    })
                     .toList();
-            return channels;
+            return binaryContents;
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

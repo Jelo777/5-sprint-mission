@@ -11,16 +11,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
-public class FIleMessageService implements MessageService {
+public class FileMessageService implements MessageService {
     private final String DIRECTORY;
-    private final String EXTENSION;
+    private final String EXTENSION = ".ser";
 
     private final UserService userService;
     private final ChannelService channelService;
 
-    public FIleMessageService(UserService userService, ChannelService channelService) {
+    public FileMessageService(UserService userService, ChannelService channelService) {
         this.DIRECTORY = "MESSAGE";
-        this.EXTENSION = ".ser";
         this.userService = userService;
         this.channelService = channelService;
         Path path = Paths.get(DIRECTORY);
@@ -47,7 +46,7 @@ public class FIleMessageService implements MessageService {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(message);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException(e);
         }
         return message;
     }
@@ -68,27 +67,23 @@ public class FIleMessageService implements MessageService {
     @Override
     public List<Message> findAll() {
         Path directory = Paths.get(DIRECTORY);
-        if (Files.exists(directory)) {
-            try {
-                List<Message> messages = Files.list(directory)
-                        .map(path -> {
-                            try (
-                                    FileInputStream fis = new FileInputStream(path.toFile());
-                                    ObjectInputStream ois = new ObjectInputStream(fis);
-                            ) {
-                                Object data = ois.readObject();
-                                return (Message) data;
-                            } catch (IOException | ClassNotFoundException e) {
-                                throw new RuntimeException(e);
-                            }
-                        })
-                        .toList();
-                return messages;
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        } else {
-            return new ArrayList<>();
+        try {
+            List<Message> messages = Files.list(directory)
+                    .map(path -> {
+                        try (
+                                FileInputStream fis = new FileInputStream(path.toFile());
+                                ObjectInputStream ois = new ObjectInputStream(fis);
+                        ) {
+                            Object data = ois.readObject();
+                            return (Message) data;
+                        } catch (IOException | ClassNotFoundException e) {
+                            throw new RuntimeException(e);
+                        }
+                    })
+                    .toList();
+            return messages;
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
