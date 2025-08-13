@@ -105,7 +105,6 @@ public class BasicUserService implements UserService {
 
         String newPassword = userUpdateRequest.newPassword();
         user.update(newUsername, newEmail, newPassword, nullableProfileId);
-
         return userRepository.save(user);
     }
 
