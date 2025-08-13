@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.List;
 import java.util.UUID;
 
 @RequiredArgsConstructor
@@ -20,10 +21,8 @@ public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
     @RequestMapping(path = "find")
-    public ResponseEntity<BinaryContent> find(@RequestParam("binaryContentId") UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentService.find(binaryContentId);
-        return ResponseEntity
-                .status(HttpStatus.OK)
-                .body(binaryContent);
+    public ResponseEntity<List<BinaryContent>> find(@RequestParam List<UUID> binaryContentIds){
+        List<BinaryContent> binaryContentList = binaryContentService.findAllByIdIn(binaryContentIds);
+        return  ResponseEntity.ok(binaryContentList);
     }
 }
