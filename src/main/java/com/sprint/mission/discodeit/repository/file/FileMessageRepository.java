@@ -2,26 +2,24 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
-import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Stream;
 
-@Repository
 public class FileMessageRepository implements MessageRepository {
     private final String DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private final String EXTENSION;
 
     public FileMessageRepository() {
         this.DIRECTORY = "MESSAGE";
+        this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
             try {
@@ -39,7 +37,7 @@ public class FileMessageRepository implements MessageRepository {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(message);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return message;
     }
@@ -63,51 +61,36 @@ public class FileMessageRepository implements MessageRepository {
     @Override
     public List<Message> findAll() {
         Path directory = Paths.get(DIRECTORY);
-        try {
-            List<Message> messages = Files.list(directory)
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            Object data = ois.readObject();
-                            return (Message) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-            return messages;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        Path directory = Paths.get(DIRECTORY);
-        try {
-            List<Message> messages = Files.list(directory)
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)) {
-                            Object data = ois.readObject();
-                            return (Message) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    }).filter(message -> message.getChannelId().equals(channelId))
-                    .toList();
-            return messages;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (Files.exists(directory)) {
+            try {
+                List<Message> messages = Files.list(directory)
+                        .map(path -> {
+                            try (
+                                    FileInputStream fis = new FileInputStream(path.toFile());
+                                    ObjectInputStream ois = new ObjectInputStream(fis)
+                            ) {
+                                Object data = ois.readObject();
+                                return (Message) data;
+                            } catch (IOException | ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .toList();
+                return messages;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return new ArrayList<>();
         }
     }
 
     @Override
     public long count() {
         Path directory = Paths.get(DIRECTORY);
+        if (!Files.exists(directory)) {
+            return 0;
+        }
         try (Stream<Path> stream = Files.list(directory)) {
             return stream.filter(path -> path.toString().endsWith(EXTENSION)).count();
         } catch (IOException e) {
@@ -129,26 +112,5 @@ public class FileMessageRepository implements MessageRepository {
     public boolean existsById(UUID id) {
         Path path = Paths.get(DIRECTORY, id + EXTENSION);
         return Files.exists(path);
-    }
-
-    @Override
-    public Optional<Instant> findLatestCreatedAtByChannelId(UUID channelId) {
-        Path directory = Paths.get(DIRECTORY);
-        try (Stream<Path> stream = Files.list(directory)) {
-            return stream.filter(path -> path.toString().endsWith(EXTENSION))
-                    .map(path -> {
-                        try (FileInputStream fis = new FileInputStream(path.toFile());
-                             ObjectInputStream ois = new ObjectInputStream(fis)) {
-                            return (Message) ois.readObject();
-                        } catch (IOException | ClassNotFoundException e) {
-                            return null;
-                        }
-                    }).filter(Objects::nonNull)
-                    .filter(message -> message.getChannelId().equals(channelId))
-                    .map(Message::getCreatedAt)
-                    .max(Instant::compareTo);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
     }
 }

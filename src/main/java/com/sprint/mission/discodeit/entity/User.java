@@ -1,39 +1,53 @@
 package com.sprint.mission.discodeit.entity;
 
-import lombok.Getter;
-
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.UUID;
 
-@Getter
 public class User implements Serializable {
     private final UUID id;
-    private UUID profileId;
-    private final Instant createdAt;
-    private Instant updatedAt;
+    private final long createdAt;
+    private long updatedAt;
 
     private String username;
     private String email;
-    private String password;
+    private transient String password;
 
-    public User(String username, String email, String password, UUID profileId) {
+    public User(String username, String email, String password) {
         this.id = UUID.randomUUID();                 // id 초기화
-        this.createdAt = Instant.now();
+        this.createdAt = Instant.now().getEpochSecond();
 
         this.username = username;
         this.email = email;
         this.password = password;
-
-        this.profileId = profileId;
     }
 
-    public void update(UUID profileId, String newUsername, String newEmail, String newPassword) {
+    public UUID getId() {
+        return id;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public long getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void update(String newUsername, String newEmail, String newPassword) {
         boolean anyValueUpdated = false;
-        if (profileId != null || this.profileId == null) {
-            this.profileId = profileId;
-            anyValueUpdated = true;
-        }
         if (newUsername != null && !newUsername.equals(this.username)) {
             this.username = newUsername;
             anyValueUpdated = true;
@@ -47,7 +61,7 @@ public class User implements Serializable {
             anyValueUpdated = true;
         }
         if (anyValueUpdated) {
-            this.updatedAt = Instant.now();
+            this.updatedAt = Instant.now().getEpochSecond();
         }
     }
 
@@ -55,7 +69,6 @@ public class User implements Serializable {
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", profileId=" + profileId +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +
                 ", username='" + username + '\'' +

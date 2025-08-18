@@ -11,10 +11,11 @@ import java.util.*;
 
 public class FileUserService implements UserService {
     private final String DIRECTORY;
-    private final String EXTENSION = ".ser";
+    private final String EXTENSION;
 
     public FileUserService() {
         this.DIRECTORY = "USER";
+        this.EXTENSION = ".ser";
         Path path = Paths.get(DIRECTORY);
         if (!path.toFile().exists()) {
             try {
@@ -33,7 +34,7 @@ public class FileUserService implements UserService {
              ObjectOutputStream oos = new ObjectOutputStream(fos)) {
             oos.writeObject(user);
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
         return user;
     }
@@ -54,23 +55,27 @@ public class FileUserService implements UserService {
     @Override
     public List<User> findAll() {
         Path directory = Paths.get(DIRECTORY);
-        try {
-            List<User> users = Files.list(directory)
-                    .map(path -> {
-                        try (
-                                FileInputStream fis = new FileInputStream(path.toFile());
-                                ObjectInputStream ois = new ObjectInputStream(fis)
-                        ) {
-                            Object data = ois.readObject();
-                            return (User) data;
-                        } catch (IOException | ClassNotFoundException e) {
-                            throw new RuntimeException(e);
-                        }
-                    })
-                    .toList();
-            return users;
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if (Files.exists(directory)) {
+            try {
+                List<User> users = Files.list(directory)
+                        .map(path -> {
+                            try (
+                                    FileInputStream fis = new FileInputStream(path.toFile());
+                                    ObjectInputStream ois = new ObjectInputStream(fis)
+                            ) {
+                                Object data = ois.readObject();
+                                return (User) data;
+                            } catch (IOException | ClassNotFoundException e) {
+                                throw new RuntimeException(e);
+                            }
+                        })
+                        .toList();
+                return users;
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        } else {
+            return new ArrayList<>();
         }
     }
 
